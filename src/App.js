@@ -32,7 +32,7 @@ export default class App extends Component {
           <Route path='/products' exact component={Products} />
           <Route path='/products/:id' component={SingleProduct} />
           <Route path='/cart' component={Cart} />
-          <Route path='/default' component={Default} />
+          <Route component={Default} />
         </Switch>
         <Footer />
       </>
