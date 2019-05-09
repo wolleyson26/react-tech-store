@@ -15,7 +15,7 @@ class ProductProvider extends Component {
         socialIcons: socialData,
         cart: [],
         cartItems: 0,
-        cartSubToal: 0,
+        cartSubTotal: 0,
         cartTax: 0,
         cartTotal: 0,
         storeProducts: [],
@@ -49,32 +49,57 @@ class ProductProvider extends Component {
             cart: this.getStorageCart(),
             singleProduct: this.getStorageProduct(),
             loading: false
-        })
+        }, () => { this.addTotals() })
     }
 
     // get cart from local storage
     getStorageCart = () => {
-        return []
+        let cart = JSON.parse(localStorage.getItem('cart')) || []
+        return cart
     }
 
     // get product from local storage
     getStorageProduct = () => {
-        return []
+        return JSON.parse(localStorage.getItem('singleProduct')) || {}
     }
 
     // get totals
     getTotals = () => {
+        let subTotal = 0
+        let cartItems = 0
+        this.state.cart.forEach(item => {
+            subTotal += item.total
+            cartItems += item.count
+        })
 
+        subTotal = parseFloat(subTotal.toFixed(2))
+        let tax = subTotal * .2
+        tax = parseFloat(tax.toFixed(2))
+        let total = subTotal + tax
+        total = parseFloat(total.toFixed(2))
+        return {
+            cartItems,
+            subTotal,
+            tax,
+            total
+        }
     }
 
     // add totals
     addTotals = () => {
+        const totals = this.getTotals()
+        this.setState({
+            cartItems: totals.cartItems,
+            cartSubTotal: totals.subTotal,
+            cartTax: totals.tax,
+            cartTotal: totals.total
 
+        })
     }
 
     // sync storage
     syncStorage = () => {
-
+        localStorage.setItem('cart', JSON.stringify(this.state.cart))
     }
 
     // add to cart
@@ -102,12 +127,16 @@ class ProductProvider extends Component {
             this.syncStorage()
             this.openCart()
         })
-        console.log(this.state.cart)
     }
 
     // set single product
     setSingleProduct = (id) => {
-        console.log(`set single product ${id}`)
+        let product = this.state.storeProducts.find(item => item.id === id)
+        // localStorage.setItem('singleProduct', JSON.stringify(product))
+        this.setState({
+            singleProduct: { ...product },
+            loading: false
+        })
     }
 
     handleSidebar = () => {

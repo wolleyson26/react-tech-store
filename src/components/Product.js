@@ -57,7 +57,20 @@ const ProductWrapper = styled.div`
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    opacity: 0;
+  }
+  @media (min-width:567px){
+    .product-icons {
+      opacity: 0;
+    }
+    .card:hover .product-icons {
+    opacity: 1;
+    }
+  }
+  @media (max-width:567px) {
+    .product-icons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
   }
   .icon  {
     font-size: 2.5rem;
@@ -66,10 +79,7 @@ const ProductWrapper = styled.div`
     color: var(--primaryColor);
     background: var(--mainBlack);
     border-radius: .5rem;
-  }
-  .card:hover .product-icons {
-    opacity: 1;
-  }
+  } 
   .card-body {
     font-weight: bold;
     letter-spacing: 2px;
