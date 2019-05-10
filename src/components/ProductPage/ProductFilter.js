@@ -17,7 +17,7 @@ export default function ProductFilter() {
                     handleChange,
                     storeProducts
                 } = value
-                console.log(value)
+
                 let companies = new Set()
                 companies.add('all')
                 for (let product in storeProducts) {

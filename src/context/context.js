@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { linkData } from './linkData'
 import { socialData } from './socialData'
-import { items } from './productData'
+// import { items } from './productData'
+import { client } from './contentful'
+
 
 const ProductContext = React.createContext();
 
@@ -34,7 +36,12 @@ class ProductProvider extends Component {
     componentDidMount() {
         // from contentful
 
-        this.setProducts(items);
+        // this.setProducts(items);
+        client.getEntries({
+            content_type: 'techStoreProduct'
+        })
+            .then((response) => this.setProducts(response.items))
+            .catch(console.error)
     }
 
     setProducts = (products) => {
@@ -50,6 +57,7 @@ class ProductProvider extends Component {
 
         // get max price
         let maxPrice = Math.max(...storeProducts.map(item => item.price))
+        maxPrice.toFixed(2)
 
         this.setState({
             storeProducts,
@@ -257,7 +265,7 @@ class ProductProvider extends Component {
         let tempProducts = [...storeProducts]
         let tempPrice = parseInt(price)
         // filtering base on price
-        tempProducts = tempProducts.filter(item => item.price <= tempPrice)
+        tempProducts = tempProducts.filter(item => item.price <= tempPrice + 1)
         // filtering based on company
         if (company !== 'all') {
             tempProducts = tempProducts.filter(item => item.company === company)
@@ -266,6 +274,7 @@ class ProductProvider extends Component {
         if (shipping) {
             tempProducts = tempProducts.filter(item => item.freeShipping === true)
         }
+        // filtering based on search
         if (search.length > 0) {
             tempProducts = tempProducts.filter(item => {
                 let tempSearch = search.toLowerCase()
