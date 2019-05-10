@@ -48,13 +48,18 @@ class ProductProvider extends Component {
         // featured products
         let featuredProducts = storeProducts.filter(item => item.featured === true)
 
+        // get max price
+        let maxPrice = Math.max(...storeProducts.map(item => item.price))
+
         this.setState({
             storeProducts,
             filteredProducts: storeProducts,
             featuredProducts,
             cart: this.getStorageCart(),
             singleProduct: this.getStorageProduct(),
-            loading: false
+            loading: false,
+            price: maxPrice,
+            max: maxPrice
         }, () => { this.addTotals() })
     }
 
@@ -234,6 +239,46 @@ class ProductProvider extends Component {
 
     }
 
+    // handle filtering
+
+    handleChange = (event) => {
+        const name = event.target.name
+        const value = event.target.type === 'checkbox'
+            ? event.target.checked
+            : event.target.value
+
+        this.setState({
+            [name]: value
+        }, this.sortData)
+    }
+
+    sortData = () => {
+        const { storeProducts, price, company, shipping, search } = this.state;
+        let tempProducts = [...storeProducts]
+        let tempPrice = parseInt(price)
+        // filtering base on price
+        tempProducts = tempProducts.filter(item => item.price <= tempPrice)
+        // filtering based on company
+        if (company !== 'all') {
+            tempProducts = tempProducts.filter(item => item.company === company)
+        }
+        // filtering based on shipping
+        if (shipping) {
+            tempProducts = tempProducts.filter(item => item.freeShipping === true)
+        }
+        if (search.length > 0) {
+            tempProducts = tempProducts.filter(item => {
+                let tempSearch = search.toLowerCase()
+                let tempTitle = item.title.toLowerCase().slice(0, search.length)
+                if (tempSearch === tempTitle) {
+                    return item
+                }
+            })
+        }
+
+        this.setState({ filteredProducts: tempProducts })
+    }
+
     render() {
         return (
             <ProductContext.Provider value={{
@@ -247,7 +292,8 @@ class ProductProvider extends Component {
                 increment: this.increment,
                 decrement: this.decrement,
                 removeItem: this.removeItem,
-                clearCart: this.clearCart
+                clearCart: this.clearCart,
+                handleChange: this.handleChange
             }}>
                 {this.props.children}
             </ProductContext.Provider>
